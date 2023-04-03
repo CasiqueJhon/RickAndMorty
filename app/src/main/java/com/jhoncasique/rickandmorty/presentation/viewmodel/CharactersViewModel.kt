@@ -2,9 +2,6 @@ package com.jhoncasique.rickandmorty.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.paging.Pager
-import androidx.paging.PagingConfig
-import com.jhoncasique.rickandmorty.data.CharactersPagingSource
 import com.jhoncasique.rickandmorty.domain.model.CharacterResponse
 import com.jhoncasique.rickandmorty.domain.usecase.GetCharactersUseCaseImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +19,6 @@ class CharactersViewModel @Inject constructor(
     val charactersState: StateFlow<CharacterResponse?> = _charactersState
 
     var currentPage = 1
-    var totalPages = 42
 
     fun getCharacters(page: Int = 0) {
         viewModelScope.launch {
@@ -40,18 +36,5 @@ class CharactersViewModel @Inject constructor(
     fun loadNextPage() {
         currentPage++
         getCharacters(currentPage)
-    }
-
-    fun loadPreviousPage() {
-        currentPage--
-        getCharacters(currentPage)
-    }
-
-    fun hasPreviousPage(): Boolean {
-        return currentPage > 1
-    }
-
-    fun hasNextPage(): Boolean {
-        return currentPage < totalPages
     }
 }

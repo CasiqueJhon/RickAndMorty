@@ -1,38 +1,36 @@
 package com.jhoncasique.rickandmorty.presentation.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.GridCells
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
-import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.core.os.bundleOf
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.rememberImagePainter
+import com.jhoncasique.rickandmorty.R
 import com.jhoncasique.rickandmorty.presentation.viewmodel.CharactersViewModel
 import com.jhoncasique.rickandmorty.domain.model.Character
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun CharactersFragment(charactersViewModel: CharactersViewModel) {
-    val charactersState = charactersViewModel.charactersState.collectAsState()
+fun CharactersFragment() {
 
-    LaunchedEffect(charactersViewModel) {
-        charactersViewModel.getCharacters()
+    val viewModel: CharactersViewModel by viewModel()
+    val charactersState = viewModel.charactersState.collectAsState()
+
+    LaunchedEffect(viewModel) {
+        viewModel.getCharacters()
     }
 
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -53,7 +51,7 @@ fun CharactersFragment(charactersViewModel: CharactersViewModel) {
                             if (index == characters.lastIndex && characters.size < (charactersState.value?.info?.count
                                     ?: 0)
                             ) {
-                                charactersViewModel.loadNextPage()
+                                viewModel.loadNextPage()
                             }
                         }
                     }
@@ -65,13 +63,17 @@ fun CharactersFragment(charactersViewModel: CharactersViewModel) {
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun CharacterItem(character: Character) {
-
+fun CharacterItem(
+    character: Character,
+    navController: NavController? = null
+) {
     Card(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.padding(4.dp),
-        elevation = 8.dp
+        elevation = 8.dp,
+        onClick = { navController?.let { navigateToCharacterDetails(it, character.id) } }
     ) {
         Column(
             modifier = Modifier.fillMaxWidth()
@@ -99,6 +101,11 @@ fun CharacterItem(character: Character) {
             )
         }
     }
+}
+
+fun navigateToCharacterDetails(navController: NavController, characterId: Int) {
+    val bundle = bundleOf("characterId" to characterId)
+    navController.navigate(R.id.action_charactersFragment_to_characterDetailsFragment, bundle)
 }
 
 
